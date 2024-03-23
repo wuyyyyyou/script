@@ -1,0 +1,11 @@
+.DS_Store
+*/.DS_Store
+
+.idea/
+*/.idea/
+
+analyze_log/files/
+bai_sheng_cve/file/
+company_domain/file/
+wangxingban/files/
+wangxingban/sync/databaseF/

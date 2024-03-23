@@ -1,0 +1,79 @@
+version: '3.1'
+services:
+    #  mongoA:
+    #      # image: registry.cn-hangzhou.aliyuncs.com/levkit/mongo:6
+    #      image: mongo:latest
+    #      container_name: mongoA
+    #      ports:
+    #      - 27017:27017
+    #      volumes:
+    #      - ./databaseA/mongo_data_tmp/configdb:/data/configdb:rw
+    #      - ./databaseA/mongo_data_tmp/db:/data/db:rw
+    #      environment:
+    #          MONGO_INITDB_ROOT_USERNAME: root
+    #          MONGO_INITDB_ROOT_PASSWORD: root
+
+    #  mongoB:
+    #      # image: registry.cn-hangzhou.aliyuncs.com/levkit/mongo:6
+    #      image: mongo:latest
+    #      container_name: mongoB
+    #      ports:
+    #      - 27018:27017
+    #      volumes:
+    #      - ./databaseB/mongo_data_tmp/configdb:/data/configdb:rw
+    #      - ./databaseB/mongo_data_tmp/db:/data/db:rw
+    #      environment:
+    #          MONGO_INITDB_ROOT_USERNAME: root
+    #          MONGO_INITDB_ROOT_PASSWORD: root
+
+    #  mongoC:
+    #      # image: registry.cn-hangzhou.aliyuncs.com/levkit/mongo:6
+    #      image: mongo:latest
+    #      container_name: mongoC
+    #      ports:
+    #      - 27019:27017
+    #      volumes:
+    #      - ./databaseC/mongo_data_tmp/configdb:/data/configdb:rw
+    #      - ./databaseC/mongo_data_tmp/db:/data/db:rw
+    #      environment:
+    #          MONGO_INITDB_ROOT_USERNAME: root
+    #          MONGO_INITDB_ROOT_PASSWORD: root
+    
+    #  mongoD:
+    #     # image: registry.cn-hangzhou.aliyuncs.com/levkit/mongo:6
+    #     image: mongo:latest
+    #     container_name: mongoD
+    #     ports:
+    #     - 27020:27017
+    #     volumes:
+    #     - ./databaseD/mongo_data_tmp/configdb:/data/configdb:rw
+    #     - ./databaseD/mongo_data_tmp/db:/data/db:rw
+    #     environment:
+    #         MONGO_INITDB_ROOT_USERNAME: root
+    #         MONGO_INITDB_ROOT_PASSWORD: root
+
+    #  mongoE:
+    #     # image: registry.cn-hangzhou.aliyuncs.com/levkit/mongo:6
+    #     image: mongo:latest
+    #     container_name: mongoE
+    #     ports:
+    #     - 27021:27017 
+    #     volumes:
+    #     - ./databaseE/mongo_data_tmp/configdb:/data/configdb:rw
+    #     - ./databaseE/mongo_data_tmp/db:/data/db:rw
+    #     environment:
+    #         MONGO_INITDB_ROOT_USERNAME: root
+    #         MONGO_INITDB_ROOT_PASSWORD: root
+
+     mongoF:
+        # image: registry.cn-hangzhou.aliyuncs.com/levkit/mongo:6
+        image: mongo:latest
+        container_name: mongoF
+        ports:
+        - 27022:27017 
+        volumes:
+        - ./databaseF/mongo_data_tmp/configdb:/data/configdb:rw
+        - ./databaseF/mongo_data_tmp/db:/data/db:rw
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: root
