@@ -40,15 +40,50 @@ func (s *Service) UpsertSeed(seed *models.Seed) error {
 	return Upsert(s.DB, oldSeed, seed)
 }
 
+func (s *Service) UpsertCompanyAndSeed(company *models.Company, seed *models.Seed) error {
+	oldCompany := &models.Company{
+		Company: company.Company,
+	}
+	oldSeed := &models.Seed{
+		SeedName: seed.SeedName,
+	}
+
+	return s.DB.Transaction(func(tx *gorm.DB) error {
+		err := Upsert(tx, oldCompany, company)
+		if err != nil {
+			return err
+		}
+
+		err = Upsert(tx, oldSeed, seed)
+		if err != nil {
+			return err
+		}
+
+		err = tx.Model(company).Association("Seeds").Append(seed)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 func (s *Service) GetAllSeeds() ([]*models.Seed, error) {
 	seeds := make([]*models.Seed, 0)
 	err := s.DB.Find(&seeds).Error
 	return seeds, err
 }
 
+func (s *Service) GetAllSeedsWithDomains() ([]*models.Seed, error) {
+	seeds := make([]*models.Seed, 0)
+	err := s.DB.Preload("Domains").
+		Find(&seeds).Error
+	return seeds, err
+}
+
 func (s *Service) GetAllSeedsWithAll() ([]*models.Seed, error) {
 	seeds := make([]*models.Seed, 0)
-	err := s.DB.Preload("Domains").Preload("Domains.IPs").Preload("Domains.IPs.Ports").
+	err := s.DB.Preload("Domains").Preload("Companys").
+		Preload("Domains.IPs").Preload("Domains.IPs.Ports").
 		Find(&seeds).Error
 	return seeds, err
 }
@@ -76,7 +111,7 @@ func (s *Service) UpsertIP(ip *models.IP) error {
 	return Upsert(s.DB, oldIP, ip)
 }
 
-func (s *Service) UpsertIPAndDomain(ip *models.IP, domain *models.Domain) error {
+func (s *Service) UpsertIPWithDomain(ip *models.IP, domain *models.Domain) error {
 	return s.DB.Transaction(func(tx *gorm.DB) error {
 		err := s.UpsertIP(ip)
 		if err != nil {
@@ -84,6 +119,33 @@ func (s *Service) UpsertIPAndDomain(ip *models.IP, domain *models.Domain) error 
 		}
 
 		err = s.DB.Model(domain).Association("IPs").Append(ip)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func (s *Service) UpsertDomainAndIPs(domain *models.Domain, ips []*models.IP) error {
+	return s.DB.Transaction(func(tx *gorm.DB) error {
+		oldDomain := &models.Domain{
+			Domain: domain.Domain,
+		}
+		err := Upsert(tx, oldDomain, domain)
+		if err != nil {
+			return err
+		}
+		for _, ip := range ips {
+			oldIP := &models.IP{
+				IP: ip.IP,
+			}
+			err := Upsert(tx, oldIP, ip)
+			if err != nil {
+				return err
+			}
+		}
+		err = tx.Model(domain).Association("IPs").Append(ips)
 		if err != nil {
 			return err
 		}
@@ -111,18 +173,13 @@ func (s *Service) UpsertIPAndPorts(ip *nmap.Host) error {
 			if err != nil {
 				return err
 			}
-			var finger string
-			if port.Service.Product != "" {
-				finger = port.Service.Product
-			} else {
-				finger = port.Service.Name
-			}
 
 			newPort := &models.Port{
-				Port:      portID,
-				Protocol:  port.Protocol,
-				Finger:    finger,
-				BelongsIP: newIP.ID,
+				Port:           portID,
+				Protocol:       port.Protocol,
+				FingerProtocol: port.Service.Name,
+				FingerElement:  port.Service.Product,
+				BelongsIP:      newIP.ID,
 			}
 			oldPort := &models.Port{
 				Port:      portID,
@@ -139,7 +196,7 @@ func (s *Service) UpsertIPAndPorts(ip *nmap.Host) error {
 	})
 }
 
-func (s *Service) UpsertSubDomain(domain *models.Domain) error {
+func (s *Service) UpsertDomain(domain *models.Domain) error {
 	oldDomain := &models.Domain{
 		Domain: domain.Domain,
 	}
@@ -150,4 +207,16 @@ func (s *Service) GetAllDomains() ([]*models.Domain, error) {
 	domains := make([]*models.Domain, 0)
 	err := s.DB.Find(&domains).Error
 	return domains, err
+}
+
+func (s *Service) GetAllDomainsWithIPs() ([]*models.Domain, error) {
+	domains := make([]*models.Domain, 0)
+	err := s.DB.Preload("IPs").Find(&domains).Error
+	return domains, err
+}
+
+func (s *Service) GetAllIPsWithoutLocation() ([]*models.IP, error) {
+	ips := make([]*models.IP, 0)
+	err := s.DB.Where("province is null or city is null").Find(&ips).Error
+	return ips, err
 }

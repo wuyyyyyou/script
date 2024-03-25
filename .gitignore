@@ -10,3 +10,4 @@ company_domain/file/
 wangxingban/files/
 wangxingban/sync/databaseF/
 asset_mapping/file/
+asset_mapping/cmd/config.toml

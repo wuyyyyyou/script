@@ -1,0 +1,12 @@
+[service]
+is_debug = true
+http_max_goroutines = 10
+ip_info_key = "keyxxxxx"
+
+[mysql]
+username = "root"
+password = "123456"
+host = "127.0.0.1"
+port = 3306
+dbname = "asset_mapping"
+timeout = "10s"

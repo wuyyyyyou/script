@@ -29,8 +29,8 @@ func GetSeedUrl(url string) string {
 	return url
 }
 
-// GetNmapXmlFilesFromDir 获取目录下的所有nmap扫描的xml文件
-func GetNmapXmlFilesFromDir(dirPath string) ([]string, error) {
+// GetXmlFilesFromDir 获取目录下的所有nmap扫描的xml文件
+func GetXmlFilesFromDir(dirPath string) ([]string, error) {
 	files := make([]string, 0)
 	err := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -38,6 +38,29 @@ func GetNmapXmlFilesFromDir(dirPath string) ([]string, error) {
 		}
 
 		if strings.HasSuffix(path, ".xml") && !info.IsDir() {
+			absPath, err := filepath.Abs(path)
+			if err != nil {
+				return err
+			}
+			files = append(files, absPath)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
+}
+
+func GetCsvFilesFromDir(dirPath string) ([]string, error) {
+	files := make([]string, 0)
+	err := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if strings.HasSuffix(path, ".csv") && !info.IsDir() {
 			absPath, err := filepath.Abs(path)
 			if err != nil {
 				return err

@@ -11,10 +11,11 @@ import (
 func TestMain_AutoMigrate(t *testing.T) {
 	svc := service.NewService()
 	err := svc.DB.AutoMigrate(
-		&models.Seed{},
-		//&models.IP{},
+		//&models.Seed{},
+		&models.IP{},
 		//&models.Port{},
-		&models.Domain{},
+		//&models.Domain{},
+		//&models.Company{},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -34,7 +35,7 @@ func TestMain_ReadSeed(t *testing.T) {
 
 func TestMain_GenerateQuakeQuery(t *testing.T) {
 	svc := service.NewService()
-	query, err := svc.GenerateQuakeQuery()
+	query, err := svc.GenerateQuakeQuery(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +52,7 @@ func TestMain_ReadNmapXml(t *testing.T) {
 
 func TestMain_ReadAllNmapXml(t *testing.T) {
 	svc := service.NewService()
-	err := svc.ReadAllNmapXml("/Users/leyouming/company_program/scan_tool/AssetMapping/nmap/0324")
+	err := svc.ReadAllNmapXml("/Users/leyouming/company_program/scan_tool/AssetMapping/nmap/0325_1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +68,7 @@ func TestMain_ReadSubDomain(t *testing.T) {
 
 func TestMain_GetIP(t *testing.T) {
 	svc := service.NewService()
-	err := svc.GetIP()
+	err := svc.GetIP(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,9 +76,9 @@ func TestMain_GetIP(t *testing.T) {
 
 func TestMain_GetIPsTxtAndNmapCommand(t *testing.T) {
 	svc := service.NewService()
-	cmd, err := svc.GetIPsTxtAndNmapCommand("/Users/leyouming/company_program/scan_tool/AssetMapping/nmap/0324",
-		"ips0324",
-		3,
+	cmd, err := svc.GetIPsTxtAndNmapCommand("/Users/leyouming/company_program/scan_tool/AssetMapping/nmap/0325_2",
+		"ips0325_2",
+		100,
 		true,
 	)
 	if err != nil {
@@ -97,7 +98,55 @@ func TestMain_GenerateSeedSudDomainsAssociation(t *testing.T) {
 
 func TestMain_OutputExcel(t *testing.T) {
 	svc := service.NewService()
-	err := svc.OutputExcel("/Users/leyouming/company_program/script/asset_mapping/file/测绘结果.xlsx")
+	err := svc.OutputExcel("/Users/leyouming/company_program/script/asset_mapping/file/测绘结果2.xlsx")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMain_ReadCompanyAndSeed(t *testing.T) {
+	svc := service.NewService()
+	err := svc.ReadCompanyAndSeed("/Users/leyouming/company_program/script/asset_mapping/file/备案域名查询2.xlsx")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMain_GenerateDomainTxt(t *testing.T) {
+	svc := service.NewService()
+	err := svc.GenerateDomainTxt("/Users/leyouming/company_program/script/asset_mapping/file/domains.txt", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMain_ReadOneForAllResult(t *testing.T) {
+	svc := service.NewService()
+	err := svc.ReadOneForAllResult("/Users/leyouming/company_program/scan_tool/OneForAll/results")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMain_GetIPLocalInfo(t *testing.T) {
+	svc := service.NewService()
+	err := svc.GetIPLocalInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMain_GetAllDomainTitle(t *testing.T) {
+	svc := service.NewService()
+	err := svc.GetAllDomainTitle(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMain_DealWithNoSubDomainSeed(t *testing.T) {
+	svc := service.NewService()
+	err := svc.DealWithNoSubDomainSeed()
 	if err != nil {
 		t.Fatal(err)
 	}

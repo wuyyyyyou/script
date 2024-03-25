@@ -42,3 +42,9 @@ func TestTmp_NoInfoIP(t *testing.T) {
 		}
 	}
 }
+
+func TestTmp_1(t *testing.T) {
+	s := "a.csv.bb.csv"
+	s = strings.Replace(s, ".csv", "", 1)
+	t.Log(s)
+}
