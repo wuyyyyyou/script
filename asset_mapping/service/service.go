@@ -59,26 +59,31 @@ func NewService() *Service {
 	service.HttpMaxGoroutines = config.ServiceConfig.HttpMaxGoroutines
 	service.swg = sizedwaitgroup.New(service.HttpMaxGoroutines)
 
-	service.DB = getDB(config.MysqlConfig)
+	service.DB = getDB(config)
 
 	service.IPInfoKey = config.ServiceConfig.IPInfoKey
 
 	return service
 }
 
-func getDB(mysqlConfig *MysqlConfig) *gorm.DB {
-	username := mysqlConfig.Username
-	password := mysqlConfig.Password
-	host := mysqlConfig.Host
-	port := mysqlConfig.Port
-	Dbname := mysqlConfig.Dbname
-	timeout := mysqlConfig.Timeout
+func getDB(config *Config) *gorm.DB {
+	username := config.MysqlConfig.Username
+	password := config.MysqlConfig.Password
+	host := config.MysqlConfig.Host
+	port := config.MysqlConfig.Port
+	Dbname := config.MysqlConfig.Dbname
+	timeout := config.MysqlConfig.Timeout
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=%s",
 		username, password, host, port, Dbname, timeout)
 
+	logLevel := logger.Default.LogMode(logger.Warn)
+	if config.ServiceConfig.IsDebug {
+		logLevel = logger.Default.LogMode(logger.Info)
+	}
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logLevel,
 	})
 	if err != nil {
 		panic(err)

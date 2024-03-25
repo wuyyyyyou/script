@@ -121,14 +121,14 @@ func (s *Service) GenerateQuakeQuery(withoutSubdomain bool) (string, error) {
 		num++
 		sb.WriteString(fmt.Sprintf("domain:\"%s\"", seed.SeedName))
 		if num != len(seeds) {
-			sb.WriteString(" || ")
+			sb.WriteString(" or ")
 		}
 	}
 	logrus.Debugf("生成了%d条url的quake查询语句", len(seeds))
 	return sb.String(), nil
 }
 
-// GenerateDomainTxt 将数据库中的domain生成txt文件，每行是一个domain
+// GenerateDomainTxt 将数据库中的种子生成txt文件，每行是一个url
 func (s *Service) GenerateDomainTxt(filePath string, withoutSubdomain bool) error {
 	var seeds []*models.Seed
 	var err error
@@ -353,6 +353,7 @@ func (s *Service) ReadOneForAllResult(dirPath string) error {
 
 			if subDomain == "" || ipStr == "" {
 				logrus.Debugf("第%d行的子域名'%s'或ip'%s'为空", i, subDomain, ipStr)
+				continue
 			}
 
 			domainModel := &models.Domain{
