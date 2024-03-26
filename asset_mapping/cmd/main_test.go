@@ -12,11 +12,11 @@ import (
 func TestMain_AutoMigrate(t *testing.T) {
 	svc := service.NewService()
 	err := svc.DB.AutoMigrate(
-		//&models.Seed{},
+		&models.Seed{},
 		&models.IP{},
-		//&models.Port{},
-		//&models.Domain{},
-		//&models.Company{},
+		&models.Port{},
+		&models.Domain{},
+		&models.Company{},
 	)
 	if err != nil {
 		t.Fatal(err)
