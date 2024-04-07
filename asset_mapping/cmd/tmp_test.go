@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"net"
 	"os"
 	"strings"
 	"testing"
@@ -43,8 +44,14 @@ func TestTmp_NoInfoIP(t *testing.T) {
 	}
 }
 
-func TestTmp_1(t *testing.T) {
-	s := "a.csv.bb.csv"
-	s = strings.Replace(s, ".csv", "", 1)
-	t.Log(s)
+func TestTmp_GetIP(t *testing.T) {
+	domain := "police.sh.cn"
+	ips, err := net.LookupIP(domain)
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, ip := range ips {
+		t.Log(ip.String())
+	}
 }

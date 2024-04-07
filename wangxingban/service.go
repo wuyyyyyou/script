@@ -2,15 +2,16 @@ package wangxingban
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
-	"net"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/anaskhan96/soup"
-	"github.com/wuyyyyyou/go-share/httputils"
+	"github.com/go-resty/resty/v2"
+	"github.com/sirupsen/logrus"
 	"github.com/wuyyyyyou/go-share/pd"
 	"github.com/wuyyyyyou/go-share/share"
 	"go.mongodb.org/mongo-driver/bson"
@@ -187,36 +188,40 @@ func (s *Service) getIpInfo(ip string) (map[string]any, error) {
 func (s *Service) getDomainTitle(domain string) string {
 	title, ok := s.domainInfoCache.Load(domain)
 	if !ok {
-		httpRequest := httputils.NewHttpRequest(domain)
-		defer httpRequest.Close()
-		httpRequest.SkipVerify()
-		httpRequest.SetTimeout(3 * time.Second)
+		client := resty.New().
+			SetTLSClientConfig(&tls.Config{
+				InsecureSkipVerify: true,
+			}).
+			SetTimeout(5 * time.Second)
 
-		if err := httpRequest.Get(); err != nil {
-			var netErr net.Error
-			if errors.As(err, &netErr) && netErr.Timeout() {
-				//title = "timeout"
-				title = ""
-			} else {
-				//title = err.Error()
-				title = ""
-			}
-		} else if httpRequest.GetResponseStatusCode() != 200 {
-			//title = fmt.Sprintf("status code: %d", httpRequest.GetResponseStatusCode())
+		resp, err := client.R().Get(domain)
+		if err != nil {
+			logrus.Debugf("请求 %s 失败: %s\n", domain, err)
+			//title = fmt.Sprintf("请求失败:%s", err)
 			title = ""
-		} else if html, err := httpRequest.GetBodyStringEncoding(); err != nil {
-			//title = err.Error()
-			title = ""
-		} else {
-			doc := soup.HTMLParse(html)
-			element := doc.Find("title")
-			if element.Error != nil {
-				//title = element.Error.Error()
-				title = ""
-			} else {
-				title = element.Text()
-			}
+			s.domainInfoCache.Store(domain, title)
+			return title.(string)
 		}
+
+		html, err := share.ConvertEncoding(resp.Header().Get("Content-Type"), resp.Body())
+		if err != nil {
+			logrus.Debugf("%s 内容解码失败: %s\n", domain, err)
+			//title = fmt.Sprintf("解码失败:%s", err)
+			title = ""
+			s.domainInfoCache.Store(domain, title)
+			return title.(string)
+		}
+
+		doc := soup.HTMLParse(string(html))
+		element := doc.Find("title")
+		if element.Error != nil {
+			logrus.Debugf("%s 获取title失败: %s\n", domain, element.Error)
+			//title = "无title"
+			title = ""
+			s.domainInfoCache.Store(domain, title)
+			return title.(string)
+		}
+		title = element.Text()
 
 		s.domainInfoCache.Store(domain, title)
 	}
